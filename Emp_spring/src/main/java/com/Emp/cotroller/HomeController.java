@@ -68,5 +68,56 @@ public class HomeController {
 		return "redirect:/home";
 		
 	}
+	
+	@RequestMapping(path="/register")
+	public String registerPage() {
+		
+		return"register";
+	}
+	
+	@RequestMapping(path="/login")
+	public String loginPage() {
+		
+		return"login";
+	}
+	
+	@RequestMapping(path="/createUser",method=RequestMethod.POST)
+	public String register(@ModelAttribute User user,HttpSession session) {
+		
+		System.out.println(user);
+		userDao.saveUser(user);
+		session.setAttribute("msg", "Registered Sucessfully");
+		return "redirect:/register";
+		
+	}
+	@RequestMapping(path="/userlogin",method=RequestMethod.POST)
+	public String login(@RequestParam("email") String em,@RequestParam("password") String pwd,HttpSession session) {
+		
+		User user=userDao.loginUser(em, pwd);
+		if(user!=null) {
+			session.setAttribute("loginUser", user);
+			return "profile";
+		}else {
+			session.setAttribute("msg", "Invalid User or Password");
+			return "redirect:/login";
+		}
+		
+	}
+	
+	@RequestMapping(path="/myProfile")
+	public String myProfile() {
+		return "profile";
+	}
+	
+	@RequestMapping(path="/logout")
+	public String logout(HttpServletRequest request) {
+		
+		HttpSession session=request.getSession();
+		session.removeAttribute("loginUser");
+		session.setAttribute("msg", "Logout Sucessfully");
+		
+		return "login";
+		
+	}
 
 }
